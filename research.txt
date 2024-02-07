@@ -1,0 +1,6 @@
+https://aws.amazon.com/compare/the-difference-between-redis-and-mongodb/#:~:text=Redis%20is%20an%20in%2Dmemory,provides%20speed%20and%20data%20durability.
+https://www.mongodb.com/blog/post/mongodb-go-driver-tutorial
+https://aws.amazon.com/nosql/in-memory/
+https://stackoverflow.com/questions/27543134/redis-handling-of-huge-dataset
+https://yuriktech.com/2021/07/19/Auditing-in-Microservices/
+https://aws.amazon.com/redis/#:~:text=Redis%20offers%20a%20fast%2C%20in,desktop%20users%20at%20a%20time.
