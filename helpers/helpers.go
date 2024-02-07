@@ -3,6 +3,7 @@ package helpers
 import (
 	"audit-log-service/models"
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -10,11 +11,16 @@ import (
 
 // decodeJSON tries to read the body of a request and sets the decoded value to the event pointer passed to it
 func DecodeJSON(event *models.Event, r *http.Request) error{
-	err := json.NewDecoder(r.Body).Decode(event)
+	dec := json.NewDecoder(r.Body)
+	err := dec.Decode(&event)
     if err != nil {
         
         return errors.Errorf("Could not decode request body of event: %s", err)
     }
+	err = dec.Decode(&struct{}{})
+	if err != io.EOF {
+		return errors.New("body must have only a single JSON value")
+	}
 	return nil
 }
 

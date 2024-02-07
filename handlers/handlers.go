@@ -4,6 +4,7 @@ import (
 	"audit-log-service/db"
 	"audit-log-service/helpers"
 	"audit-log-service/models"
+	"fmt"
 	"net/http"
 )
 
@@ -14,14 +15,21 @@ type jsonResponse struct {
 }
 
 func HandleEvent(w http.ResponseWriter, r *http.Request) {
-    var event *models.Event
+    var event models.Event
+    var resp jsonResponse
     // Parse request body into Event struct
-    helpers.DecodeJSON(event,r)
+    if err := helpers.DecodeJSON(&event,r); err != nil {
+        fmt.Println(err)
+        resp = jsonResponse{Error: true,
+            Message: "Invalid payload",}
+        helpers.WriteJSON(w,http.StatusBadRequest,resp)
+        return
+    }
     // Validate and authenticate the request
     // Save event to the database
     db.DBConn.DB.Save(&event)
     // Respond with success or error
-    resp := jsonResponse{Error: false,
+    resp = jsonResponse{Error: false,
                          Message: "Event Logged Successfully",
     }
     helpers.WriteJSON(w,http.StatusAccepted,resp)
