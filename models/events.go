@@ -13,7 +13,7 @@ import (
 //  }
 
  type Event struct {
-    ID        string    `json:"id"`
+    ID        string    `json:"id,omitempty"`
     Timestamp time.Time `json:"timestamp"`
     Type string    `json:"eventType"`
     // Common fields

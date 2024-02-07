@@ -9,6 +9,7 @@ import (
 )
 
 var DBConn *DBConnection
+var DB *gorm.DB
 
 func NewConnection(db *gorm.DB) error{
 	err := createNewConnection(db)
@@ -40,6 +41,7 @@ func createNewConnection(db *gorm.DB) error {
 	if err != nil {
 		return err
 	}
+	DB = db
 	return nil
 }
 
