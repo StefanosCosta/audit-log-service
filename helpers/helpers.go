@@ -3,14 +3,39 @@ package helpers
 import (
 	"audit-log-service/models"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
 	"github.com/pkg/errors"
+	"gorm.io/datatypes"
 )
 
+func MapEventPayloadToDb(event models.EventPayload) (models.Event){
+	// var details string
+	
+	dbEvent := models.Event{
+		Timestamp: event.Timestamp,
+		Type: event.Type,
+		ActorID: &event.ActorID,
+	}
+
+	if event.Details != nil {
+		m, err := json.Marshal(event.Details)
+		if err == nil {
+			
+			fmt.Println(m)
+			dbEvent.Details = datatypes.JSON([]byte(m))
+		}
+		
+	}
+	
+	return dbEvent
+
+}
+
 // decodeJSON tries to read the body of a request and sets the decoded value to the event pointer passed to it
-func DecodeJSON(event *models.Event, r *http.Request) error{
+func DecodeJSON(event *models.EventPayload, r *http.Request) error{
 	dec := json.NewDecoder(r.Body)
 	err := dec.Decode(&event)
     if err != nil {

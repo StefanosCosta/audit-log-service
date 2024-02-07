@@ -15,7 +15,7 @@ type jsonResponse struct {
 }
 
 func HandleEvent(w http.ResponseWriter, r *http.Request) {
-    var event models.Event
+    var event models.EventPayload
     var resp jsonResponse
     // Parse request body into Event struct
     if err := helpers.DecodeJSON(&event,r); err != nil {
@@ -26,8 +26,10 @@ func HandleEvent(w http.ResponseWriter, r *http.Request) {
         return
     }
     // Validate and authenticate the request
+
     // Save event to the database
-    db.DBConn.DB.Save(&event)
+    dbEvent := helpers.MapEventPayloadToDb(event)
+    db.DBConn.DB.Create(&dbEvent)
     // Respond with success or error
     resp = jsonResponse{Error: false,
                          Message: "Event Logged Successfully",
@@ -36,6 +38,8 @@ func HandleEvent(w http.ResponseWriter, r *http.Request) {
 
                     
 }
+
+
 
 func QueryEvents(w http.ResponseWriter, r *http.Request) {
     // Parse query parameters for field=value
