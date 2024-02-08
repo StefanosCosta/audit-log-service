@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	events "audit-log-service/eventsRepository"
 	"audit-log-service/models"
 	"encoding/json"
 	"fmt"
@@ -11,10 +12,25 @@ import (
 	"gorm.io/datatypes"
 )
 
-func MapEventPayloadToDb(event models.EventPayload) (models.Event){
+type JsonResponse struct {
+    Error bool `json:"error"`
+    Message string `json:"message"`
+}
+
+func GetInvalidPayloadResponse()(JsonResponse) {
+    return JsonResponse{Error: true, Message: "Invalid payload",}
+}
+
+func GetSuccessfulEventSubmissionResponse()(JsonResponse) {
+    return JsonResponse{Error: false, Message: "Event Logged Successfully",
+}
+}
+
+
+func MapEventPayloadToDb(event models.EventPayload) (events.Event){
 	// var details string
 	
-	dbEvent := models.Event{
+	dbEvent := events.Event{
 		Timestamp: event.Timestamp,
 		Type: event.Type,
 		ActorID: &event.ActorID,
@@ -27,7 +43,6 @@ func MapEventPayloadToDb(event models.EventPayload) (models.Event){
 			fmt.Println(m)
 			dbEvent.Details = datatypes.JSON([]byte(m))
 		}
-		
 	}
 	
 	return dbEvent

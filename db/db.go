@@ -1,7 +1,7 @@
 package db
 
 import (
-	"audit-log-service/models"
+	events "audit-log-service/eventsRepository"
 	"fmt"
 
 	"gorm.io/driver/sqlite"
@@ -19,20 +19,6 @@ func NewConnection(db *gorm.DB) error{
 	return nil
 }
 
-
-type DBConnection struct {
-	DB *gorm.DB
-} 
-
-func (connection *DBConnection) Init() {
-	var err error
-
-	if err = connection.DB.AutoMigrate(&models.Event{}); err != nil {
-		fmt.Println("could not automigrate events")
-		return
-	}
-}
-
 func createNewConnection(db *gorm.DB) error {
 	var err error
 
@@ -45,7 +31,22 @@ func createNewConnection(db *gorm.DB) error {
 	return nil
 }
 
-func createNewTestConnection(db *gorm.DB) error {
+type DBConnection struct {
+	DB *gorm.DB
+} 
+
+func (connection *DBConnection) Init() {
+	var err error
+
+	if err = connection.DB.AutoMigrate(&events.Event{}); err != nil {
+		fmt.Println("could not automigrate events")
+		return
+	}
+}
+
+
+
+func (connection *DBConnection) createNewTestConnection(db *gorm.DB) error {
 	var err error
 
 	db, err = gorm.Open(sqlite.Open("test.db"),&gorm.Config{})

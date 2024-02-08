@@ -5,7 +5,9 @@ import (
 	"audit-log-service/routes"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
+	"net/rpc"
 )
 
 const (
@@ -16,13 +18,12 @@ const (
 
 type Config struct {
 	DB *db.DBConnection
+	logger log.Logger
 }
 
 
 func main() {
 
-	// http.HandleFunc("/events", handlers.HandleEvents)
-	
 	fmt.Println("Connecting to db")
 	if err := db.NewConnection(db.DB); err != nil {
 		panic("could not connect to the database")
@@ -30,7 +31,11 @@ func main() {
 	db.DBConn = &db.DBConnection{DB: db.DB}
 
 	db.DBConn.Init()
-	// fmt.Println("Starting server")
+	
+	app := Config{DB: db.DBConn, logger: *log.Default()}
+	app.logger.Printf("Starting Server at port %s", webPort)
+
+	go rpcListen()
 
 	server := &http.Server{
 		Addr: fmt.Sprintf(":%s", webPort),
@@ -40,9 +45,7 @@ func main() {
 	if err != nil {
 		fmt.Println("failed to listen for requests", err)
 		log.Panic()
-	}
-	// go serve()
-	
+	}	
 }
 
 // func serve() {
@@ -57,6 +60,23 @@ func main() {
 // 	}
 // }
 
+func rpcListen() error {
+	log.Println("Starting RPC server on port ", rpcPort)
+	listen, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", rpcPort))
+	if err != nil {
+		return err
+	}
+	defer listen.Close()
+
+	for {
+		rpcConn, err := listen.Accept()
+		if err != nil {
+			continue
+		}
+		go rpc.ServeConn(rpcConn)
+	}
+
+}
 
 func basicHandler(w http.ResponseWriter,r *http.Request) {
 	w.Write([]byte("Hello, world!"))
