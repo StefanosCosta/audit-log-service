@@ -58,7 +58,9 @@ func MapQueryParamsToScopes(queryParams map[string][]string) ([]func(db *gorm.DB
 
 	if len(queryParams) > 0 {
 		for key, val := range(queryParams) {
-			jsonQueries = append(jsonQueries, datatypes.JSONQuery("details").Equals(val, key) ) 
+			fmt.Println(val)
+			jsonQueries = append(jsonQueries, datatypes.JSONQuery("details").Equals(val[0], key) )
+			// jsonQueries = append(jsonQueries, datatypes.JSONQuery("details").HasKey(val...))  
 		}
 	}
 	// for key, val := range(commonFields) {

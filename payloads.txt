@@ -5,8 +5,9 @@ curl -X POST http://localhost:8000/addEvent -H 'Content-Type: application/json' 
 curl -X POST http://localhost:8000/getEvents -H 'Content-Type: application/json' -d '{"timestamp":"2020-06-30T18:00:00.000Z","eventType":"Disconnect","actorId": "23568"}'
 
 
-curl -G -d "eventType=Disconnect" -d "billingAmount=123455" http://localhost:8000/getEvents
+curl -G -d "eventType=Disconnect" http://localhost:8000/getEvents
 
 -d "timestamp=2020-06-30"
 -d "eventType=Disconnect"
 -d "actorId=23568"
+-d "billingAmount=123455"

@@ -32,7 +32,13 @@ func NewEventRepo(db *gorm.DB, logger *log.Logger) (EventRepository){
 
 func (eventRepository *EventRepository) Find(jsonQueries []*datatypes.JSONQueryExpression, scopes ...func(*gorm.DB) *gorm.DB) ([]Event) {
 	var events []Event
-	eventRepository.DbInstance.Scopes(scopes...).Find(&events, jsonQueries)
+	
+	generic := make([]interface{}, len(jsonQueries))
+	for i, f := range(jsonQueries) {
+		generic[i] = f
+	}
+		
+	eventRepository.DbInstance.Scopes(scopes...).Find(&events,generic...)
 	return events
 }
 
