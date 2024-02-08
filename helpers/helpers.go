@@ -32,34 +32,42 @@ func GetSuccessfulEventSubmissionResponse()(JsonResponse) {
 }
 }
 
-func MapQueryParamsToScopes(queryParams map[string][]string) ([]func(db *gorm.DB) *gorm.DB, error) {
+func MapQueryParamsToScopes(queryParams map[string][]string) ([]func(db *gorm.DB) *gorm.DB,[]*datatypes.JSONQueryExpression, error) {
 	var scopes []func(db *gorm.DB) *gorm.DB
+	// var commonFields []string = []string{"timestamp","eventType","actorId"}
+	var jsonQueries []*datatypes.JSONQueryExpression
 
 	if len(queryParams["timestamp"]) >0 {
 		timestamp, err := time.Parse("2020-06-30T18:00:00.000Z",queryParams["timestamp"][0])
 		if err != nil {
-			return scopes, errors.Errorf("Invalid timestamp query parameter %s", err)
+			return scopes,jsonQueries, errors.Errorf("Invalid timestamp query parameter %s", err)
 		}
 		scopes = append(scopes, events.ByTimestampGreaterThan(timestamp))
 	}
+	delete(queryParams,"timestamp")
 	if len(queryParams["eventType"]) >0 {
 		
 		scopes = append(scopes, events.ByEventType(queryParams["eventType"][0]))
 	}
-
+	delete(queryParams,"eventType")
 	if len(queryParams["actorId"]) >0 {
 		
 		scopes = append(scopes, events.ByActorID(queryParams["actorId"][0]))
 	}
+	delete(queryParams,"actorId")
 
-
+	if len(queryParams) > 0 {
+		for key, val := range(queryParams) {
+			jsonQueries = append(jsonQueries, datatypes.JSONQuery("details").Equals(val, key) ) 
+		}
+	}
 	// for key, val := range(commonFields) {
 	// 	if len(queryParams[key]) > 0 {
 	// 		scopes = append(scopes, val)
 	// 	}
 	// }
 
-	return scopes, nil
+	return scopes,jsonQueries, nil
 }
 
 

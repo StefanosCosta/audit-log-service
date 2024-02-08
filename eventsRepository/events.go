@@ -30,9 +30,9 @@ func NewEventRepo(db *gorm.DB, logger *log.Logger) (EventRepository){
 	return EventRepository{DbInstance: db, Logger: logger}
 }
 
-func (eventRepository *EventRepository) Find(scopes ...func(*gorm.DB) *gorm.DB) ([]Event) {
+func (eventRepository *EventRepository) Find(jsonQueries []*datatypes.JSONQueryExpression, scopes ...func(*gorm.DB) *gorm.DB) ([]Event) {
 	var events []Event
-	eventRepository.DbInstance.Scopes(scopes...).Find(&events)
+	eventRepository.DbInstance.Scopes(scopes...).Find(&events, jsonQueries)
 	return events
 }
 
