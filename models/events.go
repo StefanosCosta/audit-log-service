@@ -15,5 +15,7 @@ type EventPayload struct {
 }
 
 
+type EventResponse []EventPayload
+
 
 

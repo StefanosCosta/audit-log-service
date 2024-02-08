@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/pkg/errors"
 	"gorm.io/datatypes"
+	"gorm.io/gorm"
 )
 
 type JsonResponse struct {
@@ -21,9 +23,43 @@ func GetInvalidPayloadResponse()(JsonResponse) {
     return JsonResponse{Error: true, Message: "Invalid payload",}
 }
 
+func GetInvalidPayloadResponseWithMessage(message string)(JsonResponse) {
+    return JsonResponse{Error: true, Message:message,}
+}
+
 func GetSuccessfulEventSubmissionResponse()(JsonResponse) {
     return JsonResponse{Error: false, Message: "Event Logged Successfully",
 }
+}
+
+func MapQueryParamsToScopes(queryParams map[string][]string) ([]func(db *gorm.DB) *gorm.DB, error) {
+	var scopes []func(db *gorm.DB) *gorm.DB
+
+	if len(queryParams["timestamp"]) >0 {
+		timestamp, err := time.Parse("2020-06-30T18:00:00.000Z",queryParams["timestamp"][0])
+		if err != nil {
+			return scopes, errors.Errorf("Invalid timestamp query parameter %s", err)
+		}
+		scopes = append(scopes, events.ByTimestampGreaterThan(timestamp))
+	}
+	if len(queryParams["eventType"]) >0 {
+		
+		scopes = append(scopes, events.ByEventType(queryParams["eventType"][0]))
+	}
+
+	if len(queryParams["actorId"]) >0 {
+		
+		scopes = append(scopes, events.ByActorID(queryParams["actorId"][0]))
+	}
+
+
+	// for key, val := range(commonFields) {
+	// 	if len(queryParams[key]) > 0 {
+	// 		scopes = append(scopes, val)
+	// 	}
+	// }
+
+	return scopes, nil
 }
 
 
@@ -46,7 +82,18 @@ func MapEventPayloadToDb(event models.EventPayload) (events.Event){
 	}
 	
 	return dbEvent
+}
 
+func MapDbPayloadToEvent(event events.Event) (models.EventPayload){
+	// var details string
+	eventPayload := models.EventPayload{
+		Timestamp: event.Timestamp,
+		Type: event.Type,
+		ActorID: *event.ActorID,
+		Details: event.Details,
+	}
+	
+	return eventPayload
 }
 
 // decodeJSON tries to read the body of a request and sets the decoded value to the event pointer passed to it

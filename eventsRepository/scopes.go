@@ -14,7 +14,7 @@ func ByEventType( eventType string) func (db *gorm.DB) *gorm.DB{
 
 func ByActorID(actorId string) func (db *gorm.DB) *gorm.DB {
 	return func (db *gorm.DB) *gorm.DB {
-		return db.Where("actorId like (?)", actorId)
+		return db.Where("actor_id = (?)", actorId)
 	}
 }
 

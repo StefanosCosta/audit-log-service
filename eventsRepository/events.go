@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-
+type Scope func(*gorm.DB) *gorm.DB
 
 type Event struct {
     // Common fields
@@ -34,4 +34,8 @@ func (eventRepository *EventRepository) Find(scopes ...func(*gorm.DB) *gorm.DB) 
 	var events []Event
 	eventRepository.DbInstance.Scopes(scopes...).Find(&events)
 	return events
+}
+
+func (eventRepository *EventRepository) Create(event *Event) error {
+	return eventRepository.DbInstance.Create(event).Error
 }
