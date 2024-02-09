@@ -40,7 +40,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
                 return
             }
             user := usersRepository.User{
-		
                 Email:    userPayload.Email,
                 Password: password,
                 // Role:     "User",

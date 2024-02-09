@@ -23,3 +23,28 @@ curl -G http://localhost:8000/getEvents -H 'Authorization: eyJhbGciOiJSUzI1NiIsI
 openssl genrsa -out jwtRS256 4096 
 
 openssl rsa -in jwtRS256 -pubout -out jwtRS256.pub
+
+curl -X POST -H 'Content-Type: application/json' -d '{"eventType":"Disconnect","actorId":"12345","params":[1, 2]}'
+
+curl -X POST -H 'Content-Type: application/json' -d '{"id": "json", "method" : "LogInfo", "params" : [{"eventType":"Disconnect","actorId":"12345"}]} http://localhost:5001
+
+curl -X POST -H 'Content-Type: application/json' -d '{"id": "json", "method" : "RPCServer.LogInfo", "params" : [{"eventType":"Disconnect","actorId":"12345"}]} http://audit-log-service:5001
+
+
+curl -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"RPCServer.LogInfo","params":[{"eventType":"Disconnect"}],"id":"1"}' "http://localhost:5001/logInfo"
+
+curl -X CONNECT --url http://localhost:5001/_goRPC_ -d '[{"id":"1","method":"RPCServer.LogInfo","params":[{"eventType":"Disconnect"},'']}]' 
+
+
+curl -i localhost:5001 -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"RPCServer.LogInfo","params":[],"id":1}'
+
+
+curl -v -X POST \
+   http://localhost:5001/rpc \
+   -H 'cache-control: no-cache' \
+   -H 'content-type: application/json' \
+   -d '{
+   "method": "RPCServer.LogInfo",
+   "params": [{
+   "eventType": "Disconnect"
+   }],"id": "1"}'

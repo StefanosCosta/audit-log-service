@@ -25,8 +25,7 @@ func SetupRoutes() http.Handler {
 	})) 
 
 	router.Use(middleware.Heartbeat("/ping"))
-
-	router.Post("/addEvent",handlers.HandleEvent)
+	
 	router.Get("/getEvents", handlers.QueryEvents)
 	router.Post("/register", handlers.Register)
 	router.Post("/login", handlers.Login)
