@@ -28,8 +28,11 @@ func GetInvalidPayloadResponseWithMessage(message string)(JsonResponse) {
 }
 
 func GetSuccessfulEventSubmissionResponse()(JsonResponse) {
-    return JsonResponse{Error: false, Message: "Event Logged Successfully",
+    return JsonResponse{Error: false, Message: "Event Logged Successfully",}
 }
+
+func GetResponseWithMessage(message string, error bool)(JsonResponse) {
+    return JsonResponse{Error: error, Message: message,}
 }
 
 func MapQueryParamsToScopes(queryParams map[string][]string) ([]func(db *gorm.DB) *gorm.DB,[]*datatypes.JSONQueryExpression, error) {
@@ -107,7 +110,7 @@ func MapDbPayloadToEvent(event events.Event) (models.EventPayload){
 }
 
 // decodeJSON tries to read the body of a request and sets the decoded value to the event pointer passed to it
-func DecodeJSON(event *models.EventPayload, r *http.Request) error{
+func DecodeEventJSON(event *models.EventPayload, r *http.Request) error{
 	dec := json.NewDecoder(r.Body)
 	err := dec.Decode(&event)
     if err != nil {
@@ -120,6 +123,21 @@ func DecodeJSON(event *models.EventPayload, r *http.Request) error{
 	}
 	return nil
 }
+
+func DecodeUserJSON(user *models.UserPayload, r *http.Request) error{
+	dec := json.NewDecoder(r.Body)
+	err := dec.Decode(&user)
+    if err != nil {
+        
+        return errors.Errorf("Could not decode request body of event: %s", err)
+    }
+	err = dec.Decode(&struct{}{})
+	if err != io.EOF {
+		return errors.New("body must have only a single JSON value")
+	}
+	return nil
+}
+
 
 // writeJSON takes a response status code, other data and writes a json response to the client
 func WriteJSON(w http.ResponseWriter, status int, data any, headers ...http.Header) error {

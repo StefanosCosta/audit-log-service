@@ -11,3 +11,10 @@ curl -G -d "eventType=Disconnect" http://localhost:8000/getEvents
 -d "eventType=Disconnect"
 -d "actorId=23568"
 -d "billingAmount=123455"
+
+curl -X POST http://localhost:8000/register -H 'Content-Type: application/json' -d '{"email":"steven@gmail.com","password":"123455678ASD!"}'
+
+curl -v -X POST http://localhost:8000/login -H 'Content-Type: application/json'  -d '{"email":"steven@gmail.com","password":"123455678ASD!"}'
+
+
+curl -X POST http://localhost:8000/getEvents -H 'Content-Type: application/json' -H 'Authorization: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDc1MzgwMTYsImlzcyI6IjEifQ.K8cUOOT6Y4LkHePnK8uU4xkpQ2QiDAk5FPtNXM31wyN6Ri0YXr3V4zzp8rzDvtXjA-kn0GBzog7OZn2449DNESpuZEviC_o2AYvhhEmtFv3JLMyna7eShwkgRdc2czAPZ6j87HPCf8wufM9CNyq99BHrWN8RGkXrdhNpklM7EG2SV-822s5TE4jzDJDS86hvxPd4q28mQB8vQ10YzjhkcKHpjySkzuxVx30d4nVJVGO196gJLqoMTQppYGbsrXGl0l-RfpXbZBputQVAz0vJXpzk4x2PQa1NIe1d2yx3um8Db6ITVK46OHEXo8Dfi_dh2HbG2jzI2w8FvVGAW-5wmxlLG4h6hL7shYBw6JTgkuB9PxzjrAmlctGG99iHHeI-IzPTXx74x2Nwqlu9YN5iro0sbQkzQYfCbLKkeCoGKXMi9T0F4zLshHjULBb3M8yn1mbSalH3oZR33I8c81ew7BraMDcqSBzS2W_wCQsH0qwD7vejJs3yWDKfAk1Jh0mOZIzoIVZ6iG5GHtfvnFoSuZK6MfyYaFYp2IYUkWwfHJO3YVAn1oqUO8fq2FsUxzjRUDcmXDSkXNLZVL3btnxTS44HZUVC7vVb7FbWmrI6zi93dzE0NIfhKhJR2aMsWvIxJ31-ffSaO1YL5HzIS1pvXqbLveI4TH2Es_WWTQhgHvA' -d '{"eventType":"Disconnect","actorId": "23568"}'

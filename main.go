@@ -1,6 +1,7 @@
 package main
 
 import (
+	"audit-log-service/config"
 	"audit-log-service/db"
 	"audit-log-service/routes"
 	"fmt"
@@ -31,6 +32,8 @@ func main() {
 	db.DBConn = &db.DBConnection{DB: db.DB}
 
 	db.DBConn.Init()
+
+	config.AuthConfig.LoadConfig("config.yml")
 	
 	app := Config{DB: db.DBConn, logger: *log.Default()}
 	app.logger.Printf("Starting Server at port %s", webPort)

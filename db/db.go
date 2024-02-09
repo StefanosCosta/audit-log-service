@@ -2,6 +2,7 @@ package db
 
 import (
 	events "audit-log-service/eventsRepository"
+	users "audit-log-service/usersRepository"
 	"fmt"
 
 	"gorm.io/driver/sqlite"
@@ -39,6 +40,11 @@ func (connection *DBConnection) Init() {
 	var err error
 
 	if err = connection.DB.AutoMigrate(&events.Event{}); err != nil {
+		fmt.Println("could not automigrate events")
+		return
+	}
+
+	if err = connection.DB.AutoMigrate(&users.User{}); err != nil {
 		fmt.Println("could not automigrate events")
 		return
 	}
