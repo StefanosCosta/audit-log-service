@@ -1,2 +1,2 @@
-private_key: jwtRS256.key
-public_key: jwtRS256.key.pub
+private_key: jwtRS256
+public_key: jwtRS256.pub

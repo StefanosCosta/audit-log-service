@@ -10,10 +10,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/datatypes"
@@ -96,15 +94,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claims := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.StandardClaims{
-		Issuer:    strconv.Itoa(int(user[0].ID)),
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), //1 day
-	})
-    
-    key, _ := jwt.ParseRSAPrivateKeyFromPEM([]byte(config.AuthConfig.PrivateKey))
-	token, err := claims.SignedString(key)
+    token, err := config.AuthConfig.GenerateToken(user[0].ID)
 
-	if err != nil {
+    if err != nil {
 		resp := helpers.GetResponseWithMessage("Login Failed", false)
 		helpers.WriteJSON(w,http.StatusInternalServerError,resp)
 		return 
@@ -170,6 +162,12 @@ func QueryEvents(w http.ResponseWriter, r *http.Request) {
 
     reqToken := r.Header.Get("Authorization")
     fmt.Println(reqToken)
+
+    if err := config.AuthConfig.Validate(reqToken); err != nil {
+        resp = helpers.GetInvalidPayloadResponseWithMessage("Invalid access token")
+        helpers.WriteJSON(w,http.StatusBadRequest,resp)
+        return
+    }
 
     queryParams := r.URL.Query()
     scopes,jsonQueries, err = helpers.MapQueryParamsToScopes(queryParams)

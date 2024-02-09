@@ -16,7 +16,7 @@ func SetupRoutes() http.Handler {
 	router := chi.NewRouter()
 
 	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"httpsL//*","http://*"},
+		AllowedOrigins: []string{"https//*","http://*"},
 		AllowedMethods: []string{"GET","POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type","X-XSRF=Token"},
 		ExposedHeaders: []string{"Link"},
