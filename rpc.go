@@ -1,6 +1,7 @@
 package main
 
 import (
+	"audit-log-service/config"
 	"audit-log-service/db"
 	eventsRepository "audit-log-service/eventsRepository"
 	"audit-log-service/helpers"
@@ -17,19 +18,14 @@ type RPCServer struct{}
 // LogInfo writes our payload to mongo
 func (rpcServer *RPCServer) LogInfo(r *http.Request, event *models.EventPayload, resp *string) error {
 
-    // var event models.EventPayload
-    // var resp helpers.JsonResponse
-    // Parse request body into Event struct
-    // if err := helpers.DecodeEventJSON(&event,r); err != nil {
-    //     fmt.Println(err)
-    //     // resp = helpers.GetInvalidPayloadResponse()
-    //     // err = helpers.WriteJSON(w,http.StatusBadRequest,resp)
-    //     return err
-		// rpc.Dial()
-    // }
-	// var resp *string
 	fmt.Println("Processing rpc call")
+    reqToken := r.Header.Get("Authorization")
+    fmt.Println(reqToken)
 
+    if err := config.AuthConfig.Validate(reqToken); err != nil {
+        *resp = "invalid access token"
+        return err
+    }
     // Save event to the database
     dbEvent := helpers.MapEventPayloadToDb(*event)
     eventRepo := eventsRepository.NewEventRepo(db.DBConn.DB,log.Default())
@@ -40,13 +36,6 @@ func (rpcServer *RPCServer) LogInfo(r *http.Request, event *models.EventPayload,
     } else{
         *resp = "Event Logged Successfully"
     }
-    // Respond with success or error
-    
-    // err =helpers.WriteJSON(w,http.StatusAccepted,resp)
-	// if err != nil {
-	// 	return err
-	// }
-	// resp is the message sent back to the RPC caller
-	// *resp = "Processed payload via RPC:" + event.Type
+
 	return nil
 }

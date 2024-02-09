@@ -43,6 +43,7 @@ curl -v -X POST \
    http://localhost:5001/rpc \
    -H 'cache-control: no-cache' \
    -H 'content-type: application/json' \
+   -H 'Authorization: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDc1OTAwNjIsImlzcyI6IjEifQ.O5HTDttIiS6UiA4ktszTyLx7WqH9aOGwFVvUxtbR93hkF7u4-L6Xhgma2pC8qY2RxIPvgl9rqxodVi1NbCgEgLZp6FMNaRiJfUhx4Tn9cs0U4qg4NBMVLV-4l6FxdxRhSIoGsQJgMNSljOLywMaOJC_2eicKAXVPxV6M3Xh14Hvpk7bEymd6DDqwbCzyztJQ6n_sMg9SNogt7YIGoa-aVbSe8kcCz_Tg5kz5tIzv0LcmSzUuYtrabx6wz3H8rtc0lP2ngIcBCse9drokVRGdQtkl2DYVzo9cwOZrRaXgSilwKkKYjjQU0GVS_RDlyFix3BrPcYV4g15Bgs9XUbgIJ8kZ79oZ2ts_JS0LmiwnKOOs9Xvh9OvbZXZRMrHE7q2Ki33KLCeQBxz9f5lMNQF1LXqcgYkJraLRnKigfDGtjBYhBD7HCr6Y2SD-S9oGwUH5ATWvAHpsfUQaTfsPF6L_oqGBLnQeEpodz7Y-K3-qrkDqYospWujUtPbrVgubiH_dIb1RAVCsga6KvLY7eaI2iOXgxnYRu7o9Tskkl8aAsXttD-a0Sur9T0DMve6nmZVijjVjhIzLks3xdL7Skd3YIDi0namMuiM0bqenNXWtMM_F6AO--uT3oCx4r3hVNSBzHbghcbCeh674nXbaJCGrwRcyf5jWrZwmz9r666lmp8k' \
    -d '{
    "method": "RPCServer.LogInfo",
    "params": [{
