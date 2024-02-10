@@ -3,7 +3,7 @@ curl -X POST http://localhost:8000/getEvents -H 'Content-Type: application/json'
 
 curl -G -d "eventType=Disconnect" http://localhost:8000/getEvents
 
--d "timestamp=2020-06-30"
+-d "timestamp=2006-01-02T15:04:05Z"
 -d "eventType=Disconnect"
 -d "actorId=23568"
 -d "billingAmount=123455"

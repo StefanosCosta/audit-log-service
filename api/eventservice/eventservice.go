@@ -4,7 +4,6 @@ import (
 	"audit-log-service/db"
 	events "audit-log-service/db/eventsRepository"
 	"audit-log-service/helpers"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -28,7 +27,7 @@ func NewEventService( db *db.DBConnection,
 	return eventService{DB: db,Logger: logger,EventRepo: userRepo}
 }
 
-func (eventSvc *eventService) QueryEvents(queryParams map[string][]string) (helpers.JsonResponse,int, []events.Event){
+func (eventSvc *eventService) QueryEvents(queryParams map[string][]string) (helpers.JsonResponse, int, []events.Event){
 	var (
 		scopes []func(db *gorm.DB) *gorm.DB
 		jsonQueries []*datatypes.JSONQueryExpression
@@ -59,7 +58,7 @@ func (eventSvc *eventService) mapQueryParamsToScopes(queryParams map[string][]st
 	)
 
 	if len(queryParams["timestamp"]) > 0 {
-		timestamp, err := time.Parse("2020-06-30T18:00:00.000Z",queryParams["timestamp"][0])
+		timestamp, err := time.Parse(time.RFC3339,queryParams["timestamp"][0])
 		if err != nil {
 			return scopes,jsonQueries, errors.Errorf("Invalid timestamp query parameter %s", err)
 		}
@@ -79,7 +78,6 @@ func (eventSvc *eventService) mapQueryParamsToScopes(queryParams map[string][]st
 
 	if len(queryParams) > 0 {
 		for key, val := range(queryParams) {
-			fmt.Println(val)
 			jsonQueries = append(jsonQueries, datatypes.JSONQuery("details").Equals(val[0], key) )
 		}
 	}

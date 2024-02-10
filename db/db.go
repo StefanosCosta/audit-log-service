@@ -13,17 +13,27 @@ var DBConn *DBConnection
 var DB *gorm.DB
 
 func NewConnection(db *gorm.DB) error{
-	err := createNewConnection(db)
+	err := createNewConnection(db, "audit.db")
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func createNewConnection(db *gorm.DB) error {
+func NewTestConnection(db *gorm.DB) error {
 	var err error
 
-	db, err = gorm.Open(sqlite.Open("audit.db"),&gorm.Config{})
+	err = createNewConnection(db, "test.db")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func createNewConnection(db *gorm.DB, filename string) error {
+	var err error
+
+	db, err = gorm.Open(sqlite.Open(filename),&gorm.Config{})
 
 	if err != nil {
 		return err
@@ -52,13 +62,3 @@ func (connection *DBConnection) Init() {
 
 
 
-func (connection *DBConnection) NewTestConnection(db *gorm.DB) error {
-	var err error
-
-	db, err = gorm.Open(sqlite.Open("test.db"),&gorm.Config{})
-
-	if err != nil {
-		return err
-	}
-	return nil
-}
