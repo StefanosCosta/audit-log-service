@@ -4,6 +4,7 @@ go 1.21.6
 
 require (
 	github.com/go-chi/cors v1.2.1
+	github.com/golang/mock v1.6.0
 	github.com/gorilla/rpc v1.2.1
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/crypto v0.14.0

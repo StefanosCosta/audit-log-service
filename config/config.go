@@ -1,5 +1,7 @@
 package config
 
+// go generate: mockgen -destination=mocks/mock_config.go -source=config/config.go
+
 import (
 	"log"
 	"os"

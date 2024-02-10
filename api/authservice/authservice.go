@@ -19,13 +19,13 @@ type authenticationService struct {
 	DB *db.DBConnection
 	Logger *log.Logger
 	UserRepo *users.UserRepository
-	AuthProvider *config.AuthConfig
+	AuthProvider config.AuthConfiger
 }
 
 func NewAuthenticationService( db *db.DBConnection,
 							   logger *log.Logger,
 							   userRepo *users.UserRepository,
-							   authProvider *config.AuthConfig) (authenticationService){
+							   authProvider config.AuthConfiger) (authenticationService){
 	return authenticationService{DB: db,Logger: logger,UserRepo: userRepo,AuthProvider: authProvider}
 }
 

@@ -35,6 +35,7 @@ func main() {
 
 	db.DBConn.Init()
 	cfgFile := "config.yml"
+	
 	config.AuthConfiguration, err = config.LoadConfig(cfgFile)
 	
 	app := Config{DB: db.DBConn, logger: *log.Default()}
