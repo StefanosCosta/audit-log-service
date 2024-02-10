@@ -34,8 +34,8 @@ func main() {
 	db.DBConn = &db.DBConnection{DB: db.DB}
 
 	db.DBConn.Init()
-
-	config.AuthConfig.LoadConfig("config.yml")
+	cfgFile := "config.yml"
+	config.AuthConfiguration, err = config.LoadConfig(cfgFile)
 	
 	app := Config{DB: db.DBConn, logger: *log.Default()}
 	app.logger.Printf("Starting Server at port %s", webPort)
@@ -66,8 +66,6 @@ func main() {
 		log.Panic()
 	}	
 }
-
-
 
 func basicHandler(w http.ResponseWriter,r *http.Request) {
 	w.Write([]byte("Hello, world!"))

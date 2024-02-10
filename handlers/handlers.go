@@ -1,25 +1,21 @@
 package handlers
 
 import (
+	authenticationservice "audit-log-service/api/authservice"
+	"audit-log-service/api/eventservice"
 	"audit-log-service/config"
 	"audit-log-service/db"
-	eventsRepository "audit-log-service/eventsRepository"
+	eventsRepository "audit-log-service/db/eventsRepository"
+	usersRepository "audit-log-service/db/usersRepository"
 	"audit-log-service/helpers"
 	"audit-log-service/models"
-	usersRepository "audit-log-service/usersRepository"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/pkg/errors"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/datatypes"
-	"gorm.io/gorm"
 )
 
 func Register(w http.ResponseWriter, r *http.Request) {
-    var err error
     var userPayload models.UserPayload
 
     if err := helpers.DecodeUserJSON(&userPayload,r); err != nil {
@@ -30,42 +26,12 @@ func Register(w http.ResponseWriter, r *http.Request) {
     }
 	
     userRepo := usersRepository.NewUserRepo(db.DBConn.DB,log.Default())
-    _, err = userRepo.FindSingleUser(usersRepository.ByEmailEquals(userPayload.Email))
-    if err != nil {
-        if errors.Is(errors.Cause(err), gorm.ErrRecordNotFound) {
-            password, err  := bcrypt.GenerateFromPassword([]byte(userPayload.Password), 14)
-            if err != nil {
-                resp := helpers.GetInvalidPayloadResponseWithMessage("Failed to register")
-                helpers.WriteJSON(w,http.StatusInternalServerError,resp)
-                return
-            }
-            user := usersRepository.User{
-                Email:    userPayload.Email,
-                Password: password,
-                // Role:     "User",
-            }
-			if err := userRepo.Create(&user); err != nil {
-                resp := helpers.GetInvalidPayloadResponseWithMessage("Failed to register")
-                helpers.WriteJSON(w,http.StatusInternalServerError,resp)
-                return
-            }
-            resp := helpers.GetResponseWithMessage("Registration Successful",false)
-            helpers.WriteJSON(w,http.StatusAccepted,resp)
-		} else {
-            resp := helpers.GetInvalidPayloadResponseWithMessage("Failed to register")
-            helpers.WriteJSON(w,http.StatusInternalServerError,resp)
-		}
-    } else {
-        resp := helpers.GetInvalidPayloadResponseWithMessage("Email or Password Already Exist")
-		helpers.WriteJSON(w,http.StatusConflict,resp)
-        return
-	}
-    
+    authService := authenticationservice.NewAuthenticationService(db.DBConn,log.Default(),&userRepo,&config.AuthConfiguration)
+    resp, status := authService.RegisterUser(userPayload.Email,userPayload.Password)
+    helpers.WriteJSON(w,status,resp)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-    var user []usersRepository.User
-    var err error
     var userPayload models.UserPayload
 
     if err := helpers.DecodeUserJSON(&userPayload,r); err != nil {
@@ -76,120 +42,54 @@ func Login(w http.ResponseWriter, r *http.Request) {
     }
 
 	userRepo := usersRepository.NewUserRepo(db.DBConn.DB,log.Default())
-    user, err = userRepo.Find(usersRepository.ByEmailEquals(userPayload.Email))
-    if err != nil {
-        return
-    }
-
-	if errors.Is(errors.Cause(err), gorm.ErrRecordNotFound) {
-		resp := helpers.GetResponseWithMessage("Email or Password does not exist", false)
-		helpers.WriteJSON(w,http.StatusNotFound,resp)
-        return
-	}
-
-	if err := bcrypt.CompareHashAndPassword(user[0].Password, []byte(userPayload.Password)); err != nil {
-		resp := helpers.GetResponseWithMessage("Email or Password incorrect", false)
-		helpers.WriteJSON(w,http.StatusBadRequest,resp)
-		return
-	}
-
-    token, err := config.AuthConfig.GenerateToken(user[0].ID)
-
-    if err != nil {
-		resp := helpers.GetResponseWithMessage("Login Failed", false)
-		helpers.WriteJSON(w,http.StatusInternalServerError,resp)
-		return 
-	}
-
-    cookie := &http.Cookie{
-        Name:     "jwt-token",
-        Value:    token,
-        Path:     "/",
-        Secure:   true,
-        HttpOnly: true,
-        Expires: time.Now().Add(time.Hour * 24),
-    }
-    http.SetCookie(w, cookie)
-
-
-	helpers.WriteJSON(w,http.StatusAccepted,"Login Successful")
-}
-
-func HandleEvent(w http.ResponseWriter, r *http.Request) {
-    // Validate and authenticate the request
-    // reqToken := r.Header.Get("Authorization")
-    // fmt.Println(reqToken)
-    // splitToken := strings.Split(reqToken, "Bearer ")
-    // reqToken = splitToken[1]
+    authService := authenticationservice.NewAuthenticationService(db.DBConn,log.Default(),&userRepo,&config.AuthConfiguration)
     
-    var event models.EventPayload
-    var resp helpers.JsonResponse
-    // Parse request body into Event struct
-    if err := helpers.DecodeEventJSON(&event,r); err != nil {
-        fmt.Println(err)
-        resp = helpers.GetInvalidPayloadResponse()
-        helpers.WriteJSON(w,http.StatusBadRequest,resp)
-        return
+    resp, status, token := authService.LoginUser(userPayload.Email,userPayload.Password)
+    if !resp.Error {
+        cookie := &http.Cookie{
+            Name:     "jwt-token",
+            Value:    token,
+            Path:     "/",
+            Secure:   true,
+            HttpOnly: true,
+            Expires: time.Now().Add(time.Hour * 24),
+        }
+        http.SetCookie(w, cookie)
     }
-
-    // Save event to the database
-    dbEvent := helpers.MapEventPayloadToDb(event)
-    eventRepo := eventsRepository.NewEventRepo(db.DBConn.DB,log.Default())
-    err :=  eventRepo.Create(&dbEvent)
-    if err != nil {
-        resp = helpers.GetInvalidPayloadResponseWithMessage("Could not create Event. Please try again later")
-    } else{
-        resp = helpers.GetSuccessfulEventSubmissionResponse()
-    }
-    // Respond with success or error
     
-    helpers.WriteJSON(w,http.StatusAccepted,resp)                    
+	helpers.WriteJSON(w,status,resp)
 }
-
-
 
 func QueryEvents(w http.ResponseWriter, r *http.Request) {
 
     var (
         resp helpers.JsonResponse
-        scopes []func(db *gorm.DB) *gorm.DB
-        jsonQueries []*datatypes.JSONQueryExpression
-
-        err error
-        events []models.EventPayload
+        dbEvents []eventsRepository.Event
+        eventsResponse []models.EventPayload
+        status int
     )
-
+    // Validate and authenticate the request
     reqToken := r.Header.Get("Authorization")
-    fmt.Println(reqToken)
 
-    if err := config.AuthConfig.Validate(reqToken); err != nil {
+    if err := config.AuthConfiguration.Validate(reqToken); err != nil {
         resp = helpers.GetInvalidPayloadResponseWithMessage("Invalid access token")
         helpers.WriteJSON(w,http.StatusBadRequest,resp)
         return
     }
 
     queryParams := r.URL.Query()
-    scopes,jsonQueries, err = helpers.MapQueryParamsToScopes(queryParams)
-    if err != nil {
-        resp = helpers.GetInvalidPayloadResponseWithMessage(err.Error())
-        helpers.WriteJSON(w,http.StatusBadRequest,resp)
-        return
-    }
-
-    // Parse query parameters for field=value
     eventRepo := eventsRepository.NewEventRepo(db.DBConn.DB,log.Default())
-    eventResponse :=  eventRepo.Find(jsonQueries,scopes...)
-    if len(eventResponse) == 0 {
-        helpers.WriteJSON(w,http.StatusBadRequest,helpers.GetInvalidPayloadResponseWithMessage("No matches found"))
+    eventService := eventservice.NewEventService(db.DBConn,log.Default(),&eventRepo)
+    resp, status, dbEvents = eventService.QueryEvents(queryParams)
+
+    if resp.Error {
+        helpers.WriteJSON(w,status,resp)
         return
     }
-
-    // Validate and authenticate the request
-    // Query database for events matching the criteria
+    
     // Serialize results to JSON and respond
-    for _,event := range (eventResponse) {
-        events = append(events, helpers.MapDbPayloadToEvent(event))
-    }
+    eventsResponse = helpers.MapDbPayloadsToEvents(dbEvents)
 
-    helpers.WriteJSON(w,http.StatusBadRequest,events)
+    helpers.WriteJSON(w,status,eventsResponse)
+    
 }

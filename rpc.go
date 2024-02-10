@@ -1,9 +1,10 @@
 package main
 
 import (
+	"audit-log-service/api/eventservice"
 	"audit-log-service/config"
 	"audit-log-service/db"
-	eventsRepository "audit-log-service/eventsRepository"
+	eventsRepository "audit-log-service/db/eventsRepository"
 	"audit-log-service/helpers"
 	"audit-log-service/models"
 	"fmt"
@@ -17,25 +18,20 @@ type RPCServer struct{}
 
 // LogInfo writes our payload to mongo
 func (rpcServer *RPCServer) LogInfo(r *http.Request, event *models.EventPayload, resp *string) error {
+    var err error 
 
 	fmt.Println("Processing rpc call")
     reqToken := r.Header.Get("Authorization")
     fmt.Println(reqToken)
 
-    if err := config.AuthConfig.Validate(reqToken); err != nil {
+    if err = config.AuthConfiguration.Validate(reqToken); err != nil {
         *resp = "invalid access token"
         return err
     }
     // Save event to the database
     dbEvent := helpers.MapEventPayloadToDb(*event)
     eventRepo := eventsRepository.NewEventRepo(db.DBConn.DB,log.Default())
-    err :=  eventRepo.Create(&dbEvent)
-    if err != nil {
-        *resp = "Could not create Event. Please try again later"
-        return err
-    } else{
-        *resp = "Event Logged Successfully"
-    }
-
-	return nil
+    eventSvc := eventservice.NewEventService(db.DBConn,log.Default(),&eventRepo)
+    *resp, err =eventSvc.CreateEvent(dbEvent)
+	return err
 }

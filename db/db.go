@@ -1,8 +1,8 @@
 package db
 
 import (
-	events "audit-log-service/eventsRepository"
-	users "audit-log-service/usersRepository"
+	events "audit-log-service/db/eventsRepository"
+	users "audit-log-service/db/usersRepository"
 	"fmt"
 
 	"gorm.io/driver/sqlite"
@@ -52,7 +52,7 @@ func (connection *DBConnection) Init() {
 
 
 
-func (connection *DBConnection) createNewTestConnection(db *gorm.DB) error {
+func (connection *DBConnection) NewTestConnection(db *gorm.DB) error {
 	var err error
 
 	db, err = gorm.Open(sqlite.Open("test.db"),&gorm.Config{})

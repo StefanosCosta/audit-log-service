@@ -1,17 +1,15 @@
 package helpers
 
 import (
-	events "audit-log-service/eventsRepository"
+	events "audit-log-service/db/eventsRepository"
 	"audit-log-service/models"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/pkg/errors"
 	"gorm.io/datatypes"
-	"gorm.io/gorm"
 )
 
 type JsonResponse struct {
@@ -35,49 +33,10 @@ func GetResponseWithMessage(message string, error bool)(JsonResponse) {
     return JsonResponse{Error: error, Message: message,}
 }
 
-func MapQueryParamsToScopes(queryParams map[string][]string) ([]func(db *gorm.DB) *gorm.DB,[]*datatypes.JSONQueryExpression, error) {
-	var scopes []func(db *gorm.DB) *gorm.DB
-	// var commonFields []string = []string{"timestamp","eventType","actorId"}
-	var jsonQueries []*datatypes.JSONQueryExpression
 
-	if len(queryParams["timestamp"]) >0 {
-		timestamp, err := time.Parse("2020-06-30T18:00:00.000Z",queryParams["timestamp"][0])
-		if err != nil {
-			return scopes,jsonQueries, errors.Errorf("Invalid timestamp query parameter %s", err)
-		}
-		scopes = append(scopes, events.ByTimestampGreaterThan(timestamp))
-	}
-	delete(queryParams,"timestamp")
-	if len(queryParams["eventType"]) >0 {
-		
-		scopes = append(scopes, events.ByEventType(queryParams["eventType"][0]))
-	}
-	delete(queryParams,"eventType")
-	if len(queryParams["actorId"]) >0 {
-		
-		scopes = append(scopes, events.ByActorID(queryParams["actorId"][0]))
-	}
-	delete(queryParams,"actorId")
-
-	if len(queryParams) > 0 {
-		for key, val := range(queryParams) {
-			fmt.Println(val)
-			jsonQueries = append(jsonQueries, datatypes.JSONQuery("details").Equals(val[0], key) )
-			// jsonQueries = append(jsonQueries, datatypes.JSONQuery("details").HasKey(val...))  
-		}
-	}
-	// for key, val := range(commonFields) {
-	// 	if len(queryParams[key]) > 0 {
-	// 		scopes = append(scopes, val)
-	// 	}
-	// }
-
-	return scopes,jsonQueries, nil
-}
 
 
 func MapEventPayloadToDb(event models.EventPayload) (events.Event){
-	// var details string
 	
 	dbEvent := events.Event{
 		Timestamp: event.Timestamp,
@@ -88,7 +47,6 @@ func MapEventPayloadToDb(event models.EventPayload) (events.Event){
 	if event.Details != nil {
 		m, err := json.Marshal(event.Details)
 		if err == nil {
-			
 			fmt.Println(m)
 			dbEvent.Details = datatypes.JSON([]byte(m))
 		}
@@ -107,6 +65,14 @@ func MapDbPayloadToEvent(event events.Event) (models.EventPayload){
 	}
 	
 	return eventPayload
+}
+
+func MapDbPayloadsToEvents(events []events.Event) (eventList []models.EventPayload) {
+
+	for _,event := range (events) {
+        eventList = append(eventList, MapDbPayloadToEvent(event))
+    }
+	return eventList
 }
 
 // decodeJSON tries to read the body of a request and sets the decoded value to the event pointer passed to it

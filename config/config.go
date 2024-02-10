@@ -11,27 +11,35 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var AuthConfig authConfig
+var AuthConfiguration AuthConfig
 
-type authConfig struct {
+
+type AuthConfiger interface {
+	GenerateToken(id uint) (string, error)
+	Validate(token string) ( error)
+}
+
+type AuthConfig struct {
 	PrivateKey []byte
 	PublicKey  []byte
 }
+
 
 type KeyConfig struct {
 	PrivateKey    string `yaml:"private_key"`
 	PublicKey string `yaml:"public_key"`
 }
 
-func (config *authConfig) LoadConfig(filename string) error {
+func LoadConfig(filename string) (AuthConfig, error) {
+	var authConfig AuthConfig
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		return err
+		return authConfig, err
 	}
 	keyConfig := &KeyConfig{}
 	err = yaml.Unmarshal(data, keyConfig)
 	if err != nil {
-		return err
+		return authConfig, err
 	}
 	prvKey, err := os.ReadFile(keyConfig.PrivateKey)
 	if err != nil {
@@ -42,13 +50,13 @@ func (config *authConfig) LoadConfig(filename string) error {
 		log.Fatalln(err)
 	}
 
-	AuthConfig.PrivateKey = prvKey
-	AuthConfig.PublicKey = pubKey
+	authConfig.PrivateKey = prvKey
+	authConfig.PublicKey = pubKey
 
-	return nil
+	return authConfig, nil
 }
 
-func (config *authConfig) GenerateToken(id uint) (string, error) {
+func (config *AuthConfig) GenerateToken(id uint) (string, error) {
 	var token string
 	var err error
 	
@@ -70,7 +78,7 @@ func (config *authConfig) GenerateToken(id uint) (string, error) {
 }
 
 
-func (config *authConfig) Validate(token string) ( error) {
+func (config *AuthConfig) Validate(token string) ( error) {
 	key, err := jwt.ParseRSAPublicKeyFromPEM(config.PublicKey)
 	if err != nil {
 		return  errors.Errorf("validate: parse key: %s", err)

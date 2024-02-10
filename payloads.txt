@@ -12,12 +12,30 @@ curl -G -d "eventType=Disconnect" http://localhost:8000/getEvents
 -d "actorId=23568"
 -d "billingAmount=123455"
 
-curl -X POST http://localhost:8000/register -H 'Content-Type: application/json' -d '{"email":"steven@gmail.com","password":"123455678ASD!"}'
+Register:
+curl -X POST http://localhost:8000/register -H 'Content-Type: application/json' -d '{"email":"stevenson@gmail.com","password":"123455678ASD!"}'
 
-curl -v -X POST http://localhost:8000/login -H 'Content-Type: application/json'  -d '{"email":"steven@gmail.com","password":"123455678ASD!"}'
+Login:
+curl -v -X POST http://localhost:8000/login -H 'Content-Type: application/json'  -d '{"email":"stevenson@gmail.com","password":"123455678ASD!"}'
+
+Query Events:
+curl -G http://localhost:8000/getEvents -H 'Authorization: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDc2Njg0MzEsImlzcyI6IjIifQ.dnVdK6duVdXBca2O26xWn-eCSQutwHGev0DNZ-hJpgpesQ50PlQDDlnd9x4oWen7kQYV6sOShUxhzJe62kvDNJaJpWxPLmjuK9SyQd_hpRIIWujn7M3zPRraiwVKBYo2ph77PkTh81qMvzlXxrvAI6TQIYGttrOkHIWZmgErCvhE6hUnw5I3tUUN9HTvgWTN9umof8AaY0lGWsr2dFgp9NzayUiAZpTdBDX64pG4USQcV8VWNFHRJpZ4Nf4aRCccDZXM-S6dDFqh855cqYsfxpjEs7vQhuCzJJnCQR79H5IMH7IG6FbExGHwr76ReMlK02DC4dVObh5j71TdEdCSRS8bsgEdYTOQyqBEtId84SSbhiTWeWoX5qZ62jcrGDvbIcrF_KzxSUtau9Dk262IOac_cJjG08X0bAxFfCdioSWKll4p2j1ap8ne6xS-yoZQjOJaYlsDAft5ZmFVv9SVR6LuNXbha7i5I7_GUaJ0yx0hfzwVnY3xvFbtIcc4FqEnV1VPp7hnzOes8yoZb-ZhXctFyw836sEQZJFgTk_WEcRDuXq0fiWpUvZLrnJbkqQQePYYYEf6cAyhBF5e4F70mdTCn2QqjqgBrkCyNP_NrKdThICQDaFN365z0QvqWL2BiHiYbSH5lwn_cMv8_gHAMaCu_XYnJCkngvpmjSAULv0' -d "eventType=Disconnect" -d "actorId=23567"
+
+Log Events Via RPC:
+
+curl -v -X POST \
+   http://localhost:5001/rpc \
+   -H 'cache-control: no-cache' \
+   -H 'content-type: application/json' \
+   -H 'Authorization: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDc1OTAwNjIsImlzcyI6IjEifQ.O5HTDttIiS6UiA4ktszTyLx7WqH9aOGwFVvUxtbR93hkF7u4-L6Xhgma2pC8qY2RxIPvgl9rqxodVi1NbCgEgLZp6FMNaRiJfUhx4Tn9cs0U4qg4NBMVLV-4l6FxdxRhSIoGsQJgMNSljOLywMaOJC_2eicKAXVPxV6M3Xh14Hvpk7bEymd6DDqwbCzyztJQ6n_sMg9SNogt7YIGoa-aVbSe8kcCz_Tg5kz5tIzv0LcmSzUuYtrabx6wz3H8rtc0lP2ngIcBCse9drokVRGdQtkl2DYVzo9cwOZrRaXgSilwKkKYjjQU0GVS_RDlyFix3BrPcYV4g15Bgs9XUbgIJ8kZ79oZ2ts_JS0LmiwnKOOs9Xvh9OvbZXZRMrHE7q2Ki33KLCeQBxz9f5lMNQF1LXqcgYkJraLRnKigfDGtjBYhBD7HCr6Y2SD-S9oGwUH5ATWvAHpsfUQaTfsPF6L_oqGBLnQeEpodz7Y-K3-qrkDqYospWujUtPbrVgubiH_dIb1RAVCsga6KvLY7eaI2iOXgxnYRu7o9Tskkl8aAsXttD-a0Sur9T0DMve6nmZVijjVjhIzLks3xdL7Skd3YIDi0namMuiM0bqenNXWtMM_F6AO--uT3oCx4r3hVNSBzHbghcbCeh674nXbaJCGrwRcyf5jWrZwmz9r666lmp8k' \
+   -d '{
+   "method": "RPCServer.LogInfo",
+   "params": [{
+   "eventType": "Disconnect",
+   "actorId": "12346690"
+   }],"id": "1"}'
 
 
-curl -G http://localhost:8000/getEvents -H 'Authorization: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDc1OTAwNjIsImlzcyI6IjEifQ.O5HTDttIiS6UiA4ktszTyLx7WqH9aOGwFVvUxtbR93hkF7u4-L6Xhgma2pC8qY2RxIPvgl9rqxodVi1NbCgEgLZp6FMNaRiJfUhx4Tn9cs0U4qg4NBMVLV-4l6FxdxRhSIoGsQJgMNSljOLywMaOJC_2eicKAXVPxV6M3Xh14Hvpk7bEymd6DDqwbCzyztJQ6n_sMg9SNogt7YIGoa-aVbSe8kcCz_Tg5kz5tIzv0LcmSzUuYtrabx6wz3H8rtc0lP2ngIcBCse9drokVRGdQtkl2DYVzo9cwOZrRaXgSilwKkKYjjQU0GVS_RDlyFix3BrPcYV4g15Bgs9XUbgIJ8kZ79oZ2ts_JS0LmiwnKOOs9Xvh9OvbZXZRMrHE7q2Ki33KLCeQBxz9f5lMNQF1LXqcgYkJraLRnKigfDGtjBYhBD7HCr6Y2SD-S9oGwUH5ATWvAHpsfUQaTfsPF6L_oqGBLnQeEpodz7Y-K3-qrkDqYospWujUtPbrVgubiH_dIb1RAVCsga6KvLY7eaI2iOXgxnYRu7o9Tskkl8aAsXttD-a0Sur9T0DMve6nmZVijjVjhIzLks3xdL7Skd3YIDi0namMuiM0bqenNXWtMM_F6AO--uT3oCx4r3hVNSBzHbghcbCeh674nXbaJCGrwRcyf5jWrZwmz9r666lmp8k' -d "eventType=Disconnect"
 
 
 openssl genrsa -out jwtRS256 4096 
@@ -39,13 +57,3 @@ curl -X CONNECT --url http://localhost:5001/_goRPC_ -d '[{"id":"1","method":"RPC
 curl -i localhost:5001 -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"RPCServer.LogInfo","params":[],"id":1}'
 
 
-curl -v -X POST \
-   http://localhost:5001/rpc \
-   -H 'cache-control: no-cache' \
-   -H 'content-type: application/json' \
-   -H 'Authorization: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDc1OTAwNjIsImlzcyI6IjEifQ.O5HTDttIiS6UiA4ktszTyLx7WqH9aOGwFVvUxtbR93hkF7u4-L6Xhgma2pC8qY2RxIPvgl9rqxodVi1NbCgEgLZp6FMNaRiJfUhx4Tn9cs0U4qg4NBMVLV-4l6FxdxRhSIoGsQJgMNSljOLywMaOJC_2eicKAXVPxV6M3Xh14Hvpk7bEymd6DDqwbCzyztJQ6n_sMg9SNogt7YIGoa-aVbSe8kcCz_Tg5kz5tIzv0LcmSzUuYtrabx6wz3H8rtc0lP2ngIcBCse9drokVRGdQtkl2DYVzo9cwOZrRaXgSilwKkKYjjQU0GVS_RDlyFix3BrPcYV4g15Bgs9XUbgIJ8kZ79oZ2ts_JS0LmiwnKOOs9Xvh9OvbZXZRMrHE7q2Ki33KLCeQBxz9f5lMNQF1LXqcgYkJraLRnKigfDGtjBYhBD7HCr6Y2SD-S9oGwUH5ATWvAHpsfUQaTfsPF6L_oqGBLnQeEpodz7Y-K3-qrkDqYospWujUtPbrVgubiH_dIb1RAVCsga6KvLY7eaI2iOXgxnYRu7o9Tskkl8aAsXttD-a0Sur9T0DMve6nmZVijjVjhIzLks3xdL7Skd3YIDi0namMuiM0bqenNXWtMM_F6AO--uT3oCx4r3hVNSBzHbghcbCeh674nXbaJCGrwRcyf5jWrZwmz9r666lmp8k' \
-   -d '{
-   "method": "RPCServer.LogInfo",
-   "params": [{
-   "eventType": "Disconnect"
-   }],"id": "1"}'
