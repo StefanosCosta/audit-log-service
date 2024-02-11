@@ -5,7 +5,7 @@ Login:
 curl -v -X POST http://localhost:8000/login -H 'Content-Type: application/json'  -d '{"email":"stevenson@gmail.com","password":"123455678ASD!"}'
 
 Query Events:
-curl -G http://localhost:8000/getEvents -H 'Authorization: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDc2Njg0MzEsImlzcyI6IjIifQ.dnVdK6duVdXBca2O26xWn-eCSQutwHGev0DNZ-hJpgpesQ50PlQDDlnd9x4oWen7kQYV6sOShUxhzJe62kvDNJaJpWxPLmjuK9SyQd_hpRIIWujn7M3zPRraiwVKBYo2ph77PkTh81qMvzlXxrvAI6TQIYGttrOkHIWZmgErCvhE6hUnw5I3tUUN9HTvgWTN9umof8AaY0lGWsr2dFgp9NzayUiAZpTdBDX64pG4USQcV8VWNFHRJpZ4Nf4aRCccDZXM-S6dDFqh855cqYsfxpjEs7vQhuCzJJnCQR79H5IMH7IG6FbExGHwr76ReMlK02DC4dVObh5j71TdEdCSRS8bsgEdYTOQyqBEtId84SSbhiTWeWoX5qZ62jcrGDvbIcrF_KzxSUtau9Dk262IOac_cJjG08X0bAxFfCdioSWKll4p2j1ap8ne6xS-yoZQjOJaYlsDAft5ZmFVv9SVR6LuNXbha7i5I7_GUaJ0yx0hfzwVnY3xvFbtIcc4FqEnV1VPp7hnzOes8yoZb-ZhXctFyw836sEQZJFgTk_WEcRDuXq0fiWpUvZLrnJbkqQQePYYYEf6cAyhBF5e4F70mdTCn2QqjqgBrkCyNP_NrKdThICQDaFN365z0QvqWL2BiHiYbSH5lwn_cMv8_gHAMaCu_XYnJCkngvpmjSAULv0' -d "eventType=Disconnect" -d "actorId=12346690"
+curl -G http://localhost:8000/getEvents -H 'Authorization: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDc2Njg0MzEsImlzcyI6IjIifQ.dnVdK6duVdXBca2O26xWn-eCSQutwHGev0DNZ-hJpgpesQ50PlQDDlnd9x4oWen7kQYV6sOShUxhzJe62kvDNJaJpWxPLmjuK9SyQd_hpRIIWujn7M3zPRraiwVKBYo2ph77PkTh81qMvzlXxrvAI6TQIYGttrOkHIWZmgErCvhE6hUnw5I3tUUN9HTvgWTN9umof8AaY0lGWsr2dFgp9NzayUiAZpTdBDX64pG4USQcV8VWNFHRJpZ4Nf4aRCccDZXM-S6dDFqh855cqYsfxpjEs7vQhuCzJJnCQR79H5IMH7IG6FbExGHwr76ReMlK02DC4dVObh5j71TdEdCSRS8bsgEdYTOQyqBEtId84SSbhiTWeWoX5qZ62jcrGDvbIcrF_KzxSUtau9Dk262IOac_cJjG08X0bAxFfCdioSWKll4p2j1ap8ne6xS-yoZQjOJaYlsDAft5ZmFVv9SVR6LuNXbha7i5I7_GUaJ0yx0hfzwVnY3xvFbtIcc4FqEnV1VPp7hnzOes8yoZb-ZhXctFyw836sEQZJFgTk_WEcRDuXq0fiWpUvZLrnJbkqQQePYYYEf6cAyhBF5e4F70mdTCn2QqjqgBrkCyNP_NrKdThICQDaFN365z0QvqWL2BiHiYbSH5lwn_cMv8_gHAMaCu_XYnJCkngvpmjSAULv0' -d "eventType=Signup" -d "actorId=12346690"
 
 query options:
 -d "timestamp=2006-01-02T15:04:05Z"
@@ -22,7 +22,7 @@ curl -v -X POST \
    -d '{
    "method": "RPCServer.LogInfo",
    "params": [{
-   "eventType": "Disconnect",
+   "eventType": "Signup",
    "actorId": "12346690",
    "details" : {"name" : "Costas"}
    }],"id": "1"}'
