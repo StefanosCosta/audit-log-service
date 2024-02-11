@@ -25,7 +25,7 @@ Finally, I decided to emulate such solution using sqlite3, as it would be an in 
 
 The service has to accept event data sent by other systems and provide an HTTP endpoint for querying recorded event data by field values. To accept data by other systems, I chose to implement a Remote Procedure Call(RPC) which is usually used in distributed systems. However, I soon discovered that the only way to call an rpc server using curl, which is required by the document, is to use json-rpc. Therefore two servers are deployed: the rpc server uses json-rpc to receive requests listening at port 5001, and an http server listens at port 8000 for registering, login, and event querying.
 
-Authentication is made using rsa keys to generate jwt authentication tokens that are passed to the user upon login, and then need to be used in subsequent requests' authorisation header to be able to query or create new events. There is also a register service for registering a new user. Even though an IAM authentication service would be the proper choice here, the given the constraints of this project, make this impossible.
+Authentication is made using rsa keys to generate and verify jwt authentication tokens that are passed to the user upon login, and then need to be used in subsequent requests' authorisation header to be able to query or create new events. There is also a register service for registering a new user. Even though an IAM authentication service would be the proper choice here, the given the constraints of this project, make this impossible.
 
 The yaml and key file would also normally be stored on Amazon S3 or equivalent. The login service in this file is also redundant for rpc calls, as usually in microservices there is an authorization service dedicated to doing so, and the rpc calls are being made by a service that is already authorized to do so.
 
@@ -42,3 +42,5 @@ Sample requests for each api are available in the payloads.txt file in this repo
 ## How to run:
 
 A simple "go run main.go" should do the trick.
+
+The repository can be found at https://github.com/StefanosCosta/audit-log-service
