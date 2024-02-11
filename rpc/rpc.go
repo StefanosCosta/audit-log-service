@@ -1,4 +1,4 @@
-package main
+package rpcservice
 
 import (
 	"audit-log-service/api/eventservice"

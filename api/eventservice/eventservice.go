@@ -50,7 +50,8 @@ func (eventSvc *eventService) QueryEvents(queryParams map[string][]string) (help
 	return helpers.GetSuccessfulEventSubmissionResponse(),http.StatusAccepted, eventResponse
 }
 
-
+// TODO Add more logic for more complex and flexible querying
+// maps query parameters to appropriate scope for querying the db
 func (eventSvc *eventService) mapQueryParamsToScopes(queryParams map[string][]string) ([]func(db *gorm.DB) *gorm.DB,[]*datatypes.JSONQueryExpression, error) {
 	var (
 		scopes []func(db *gorm.DB) *gorm.DB
@@ -75,7 +76,7 @@ func (eventSvc *eventService) mapQueryParamsToScopes(queryParams map[string][]st
 		scopes = append(scopes, events.ByActorID(queryParams["actorId"][0]))
 	}
 	delete(queryParams,"actorId")
-
+	
 	if len(queryParams) > 0 {
 		for key, val := range(queryParams) {
 			jsonQueries = append(jsonQueries, datatypes.JSONQuery("details").Equals(val[0], key) )

@@ -34,6 +34,7 @@ func (authService *authenticationService) RegisterUser(email string, password st
 	_, err = authService.UserRepo.FindSingleUser(usersRepository.ByEmailEquals(email))
     if err != nil {
         if errors.Is(errors.Cause(err), gorm.ErrRecordNotFound) {
+			// TODO Use SHA-256 for hashing instead of this shortcut
             password, err  := bcrypt.GenerateFromPassword([]byte(password), 14)
             if err != nil {
                 resp := helpers.GetInvalidPayloadResponseWithMessage("Failed to register")

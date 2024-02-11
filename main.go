@@ -4,6 +4,7 @@ import (
 	"audit-log-service/config"
 	"audit-log-service/db"
 	"audit-log-service/routes"
+	rpcservice "audit-log-service/rpc"
 	"fmt"
 	"log"
 	"net/http"
@@ -45,7 +46,7 @@ func main() {
 		s := rpc.NewServer()
 		s.RegisterCodec(json.NewCodec(), "application/json")
 		// s.RegisterCodec(json.NewCodec(), "application/json;charset=UTF-8")
-		rpcServer := new(RPCServer)
+		rpcServer := new(rpcservice.RPCServer)
 		s.RegisterService(rpcServer, "")
 		r := mux.NewRouter()
 		r.Handle("/rpc",s)
